@@ -23,26 +23,6 @@ android {
         versionName "1.0.0"
     }
 
-    flavorDimensions = ["script"]
-    productFlavors {
-        latin {
-            dimension "script"
-            versionNameSuffix "-latin"
-        }
-        devanagari {
-            dimension "script"
-            versionNameSuffix "-devanagari"
-        }
-        cjk {
-            dimension "script"
-            versionNameSuffix "-cjk"
-        }
-        full {
-            dimension "script"
-            versionNameSuffix "-full"
-        }
-    }
-
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             release {
@@ -79,9 +59,8 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def abi = output.getFilter(com.android.build.OutputFile.ABI)
-            def flavor = variant.flavorName
             if (abi != null) {
-                outputFileName = "ocr_plugin-${flavor}-${abi}.apk"
+                outputFileName = "ocr_plugin-${abi}.apk"
             }
         }
     }
@@ -102,37 +81,19 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 
     // ML Kit Text Recognition v2 bundled offline models
-    latinImplementation('com.google.mlkit:text-recognition:16.0.1') {
+    implementation('com.google.mlkit:text-recognition:16.0.1') {
         exclude group: 'androidx.work', module: 'work-runtime'
     }
-
-    devanagariImplementation('com.google.mlkit:text-recognition-devanagari:16.0.1') {
+    implementation('com.google.mlkit:text-recognition-devanagari:16.0.1') {
         exclude group: 'androidx.work', module: 'work-runtime'
     }
-
-    cjkImplementation('com.google.mlkit:text-recognition-chinese:16.0.1') {
+    implementation('com.google.mlkit:text-recognition-chinese:16.0.1') {
         exclude group: 'androidx.work', module: 'work-runtime'
     }
-    cjkImplementation('com.google.mlkit:text-recognition-japanese:16.0.1') {
+    implementation('com.google.mlkit:text-recognition-japanese:16.0.1') {
         exclude group: 'androidx.work', module: 'work-runtime'
     }
-    cjkImplementation('com.google.mlkit:text-recognition-korean:16.0.1') {
-        exclude group: 'androidx.work', module: 'work-runtime'
-    }
-
-    fullImplementation('com.google.mlkit:text-recognition:16.0.1') {
-        exclude group: 'androidx.work', module: 'work-runtime'
-    }
-    fullImplementation('com.google.mlkit:text-recognition-devanagari:16.0.1') {
-        exclude group: 'androidx.work', module: 'work-runtime'
-    }
-    fullImplementation('com.google.mlkit:text-recognition-chinese:16.0.1') {
-        exclude group: 'androidx.work', module: 'work-runtime'
-    }
-    fullImplementation('com.google.mlkit:text-recognition-japanese:16.0.1') {
-        exclude group: 'androidx.work', module: 'work-runtime'
-    }
-    fullImplementation('com.google.mlkit:text-recognition-korean:16.0.1') {
+    implementation('com.google.mlkit:text-recognition-korean:16.0.1') {
         exclude group: 'androidx.work', module: 'work-runtime'
     }
 }

@@ -18,8 +18,8 @@ class TextRecognizerImpl : ITextRecognizer {
     }
 
     private var recognizer: TextRecognizer? = null
-    private var scriptName: String = "latin"
-    private var displayName: String = "Latin"
+    private var scriptName: String = "full"
+    private var displayName: String = "Full"
     private var isInitialized = false
 
     override fun getInterfaceVersion(): Int = 1
@@ -90,75 +90,12 @@ class TextRecognizerImpl : ITextRecognizer {
     }
 
     private fun createRecognizer(): TextRecognizer {
-        // 1. Try Devanagari
-        try {
-            val devanagariClass = Class.forName("com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions")
-            val builderClass = Class.forName("com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions\$Builder")
-            val builder = builderClass.getConstructor().newInstance()
-            val buildMethod = builderClass.getMethod("build")
-            val options = buildMethod.invoke(builder)
-            val getClientMethod = TextRecognition::class.java.methods.firstOrNull { it.name == "getClient" && it.parameterTypes.size == 1 }
-            if (getClientMethod != null && options != null) {
-                scriptName = "devanagari"
-                displayName = "Devanagari"
-                return getClientMethod.invoke(null, options) as TextRecognizer
-            }
-        } catch (_: Throwable) {}
-
-        // 2. Try Chinese
-        try {
-            val chineseClass = Class.forName("com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions")
-            val builderClass = Class.forName("com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions\$Builder")
-            val builder = builderClass.getConstructor().newInstance()
-            val buildMethod = builderClass.getMethod("build")
-            val options = buildMethod.invoke(builder)
-            val getClientMethod = TextRecognition::class.java.methods.firstOrNull { it.name == "getClient" && it.parameterTypes.size == 1 }
-            if (getClientMethod != null && options != null) {
-                scriptName = "chinese"
-                displayName = "Chinese"
-                return getClientMethod.invoke(null, options) as TextRecognizer
-            }
-        } catch (_: Throwable) {}
-
-        // 3. Try Japanese
-        try {
-            val japaneseClass = Class.forName("com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions")
-            val builderClass = Class.forName("com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions\$Builder")
-            val builder = builderClass.getConstructor().newInstance()
-            val buildMethod = builderClass.getMethod("build")
-            val options = buildMethod.invoke(builder)
-            val getClientMethod = TextRecognition::class.java.methods.firstOrNull { it.name == "getClient" && it.parameterTypes.size == 1 }
-            if (getClientMethod != null && options != null) {
-                scriptName = "japanese"
-                displayName = "Japanese"
-                return getClientMethod.invoke(null, options) as TextRecognizer
-            }
-        } catch (_: Throwable) {}
-
-        // 4. Try Korean
-        try {
-            val koreanClass = Class.forName("com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions")
-            val builderClass = Class.forName("com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions\$Builder")
-            val builder = builderClass.getConstructor().newInstance()
-            val buildMethod = builderClass.getMethod("build")
-            val options = buildMethod.invoke(builder)
-            val getClientMethod = TextRecognition::class.java.methods.firstOrNull { it.name == "getClient" && it.parameterTypes.size == 1 }
-            if (getClientMethod != null && options != null) {
-                scriptName = "korean"
-                displayName = "Korean"
-                return getClientMethod.invoke(null, options) as TextRecognizer
-            }
-        } catch (_: Throwable) {}
-
-        // 5. Try Latin
         try {
             val latinClass = Class.forName("com.google.mlkit.vision.text.latin.TextRecognizerOptions")
             val defaultField = latinClass.getField("DEFAULT_OPTIONS")
             val options = defaultField.get(null)
             val getClientMethod = TextRecognition::class.java.methods.firstOrNull { it.name == "getClient" && it.parameterTypes.size == 1 }
             if (getClientMethod != null && options != null) {
-                scriptName = "latin"
-                displayName = "Latin"
                 return getClientMethod.invoke(null, options) as TextRecognizer
             }
         } catch (_: Throwable) {}
