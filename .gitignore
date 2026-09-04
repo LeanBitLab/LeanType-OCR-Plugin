@@ -1,10 +1,21 @@
 *.iml
-.gradle
+.gradle/
 /local.properties
-/.idea
+/.idea/
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+Thumbs.db
+/build/
+/*/build/
+/captures/
+.externalNativeBuild/
+.cxx/
 local.properties
+*.keystore
+*.jks
+keystore.properties
+plugin-release.jks
+
+# Antigravity local agent files
+.antigravity/
+.agents/
+.antigravityignore
