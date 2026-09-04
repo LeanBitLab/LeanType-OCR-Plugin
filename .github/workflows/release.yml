@@ -26,6 +26,22 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Setup Signing Keystore
+        if: env.RELEASE_KEYSTORE != ''
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+        run: |
+          echo "$RELEASE_KEYSTORE" | base64 -d > plugin-release.jks
+          cat <<EOF > keystore.properties
+          keyAlias=$RELEASE_KEY_ALIAS
+          keyPassword=$RELEASE_KEY_PASSWORD
+          storeFile=plugin-release.jks
+          storePassword=$RELEASE_STORE_PASSWORD
+          EOF
+
       - name: Build Release APKs
         run: ./gradlew assembleRelease
 
