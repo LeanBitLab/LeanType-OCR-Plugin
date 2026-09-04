@@ -1,5 +1,7 @@
 # Proguard rules for LeanType OCR Plugin
 
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod,SourceFile,LineNumberTable
+
 # Keep the entry point class, its constructor, and all public methods,
 # as it is loaded dynamically by class name reflection.
 -keep class helium314.keyboard.ocr.plugin.TextRecognizerImpl {
@@ -24,5 +26,9 @@
 -keep interface com.google.android.gms.** { *; }
 -keep class androidx.work.** { *; }
 -keep interface androidx.work.** { *; }
+
 -dontwarn com.google.**
 -dontwarn androidx.**
+-dontwarn javax.annotation.**
+-dontwarn org.checkerframework.**
+
