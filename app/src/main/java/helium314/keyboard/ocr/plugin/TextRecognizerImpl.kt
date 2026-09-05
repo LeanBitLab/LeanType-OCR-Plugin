@@ -60,7 +60,13 @@ class TextRecognizerImpl : ITextRecognizer {
             ensureNativeLibrariesLoaded()
             ensureMlKitInitialized(context)
             initRecognizers()
-            isInitialized = isAvailable()
+            isInitialized = (
+                devanagariRecognizer != null ||
+                chineseRecognizer != null ||
+                japaneseRecognizer != null ||
+                koreanRecognizer != null ||
+                latinRecognizer != null
+            )
             Log.i(TAG, "OCR Plugin initialized successfully (${getDisplayName()})")
         } catch (e: Throwable) {
             Log.e(TAG, "Failed to initialize TextRecognizerImpl", e)
