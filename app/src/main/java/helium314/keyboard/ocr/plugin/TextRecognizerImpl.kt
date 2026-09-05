@@ -158,6 +158,7 @@ class TextRecognizerImpl : ITextRecognizer {
     override fun recognize(bitmap: Bitmap, keepLineBreaks: Boolean): List<String>? {
         val scriptPref = getSelectedScript()
         val image = InputImage.fromBitmap(bitmap, 0)
+        Log.i(TAG, "recognize() invoked: image=${bitmap.width}x${bitmap.height}, scriptPref=$scriptPref")
 
         // If user selected a specific script, run only that recognizer
         val selectedRecognizer = when (scriptPref) {
@@ -173,7 +174,7 @@ class TextRecognizerImpl : ITextRecognizer {
             return runSingleRecognizer(selectedRecognizer, image)
         }
 
-        // "all" / Universal mode: run all available composite recognizers concurrently
+        // "all" / Universal mode: run all available composite recognizers
         val activeRecognizers = listOfNotNull(
             devanagariRecognizer,
             chineseRecognizer,
@@ -181,24 +182,32 @@ class TextRecognizerImpl : ITextRecognizer {
             koreanRecognizer
         ).ifEmpty { listOfNotNull(latinRecognizer) }
 
-        if (activeRecognizers.isEmpty()) return null
-
-        val results = runBlocking(Dispatchers.Default) {
-            activeRecognizers.map { rec ->
-                async {
-                    try {
-                        val task = rec.process(image)
-                        Tasks.await(task, 15, TimeUnit.SECONDS)
-                    } catch (e: Throwable) {
-                        Log.w(TAG, "Recognizer pass failed", e)
-                        null
-                    }
-                }
-            }.awaitAll().filterNotNull()
+        if (activeRecognizers.isEmpty()) {
+            Log.w(TAG, "No active recognizers available")
+            return null
         }
 
-        if (results.isEmpty()) return null
-        return mergeAndDeduplicate(results)
+        val results = mutableListOf<Text>()
+        for (rec in activeRecognizers) {
+            try {
+                val task = rec.process(image)
+                val text = Tasks.await(task, 15, TimeUnit.SECONDS)
+                if (text != null && text.text.isNotBlank()) {
+                    Log.i(TAG, "Recognizer pass produced ${text.textBlocks.size} blocks: ${text.text.take(60)}")
+                    results.add(text)
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "Recognizer pass failed for $rec", e)
+            }
+        }
+
+        if (results.isEmpty()) {
+            Log.w(TAG, "No text recognized across all active recognizers")
+            return null
+        }
+        val merged = mergeAndDeduplicate(results)
+        Log.i(TAG, "Final merged and deduplicated text lines: ${merged.size}")
+        return merged
     }
 
     private fun getSelectedScript(): String {
@@ -220,6 +229,7 @@ class TextRecognizerImpl : ITextRecognizer {
         return try {
             val task = rec.process(image)
             val result = Tasks.await(task, 25, TimeUnit.SECONDS) ?: return null
+            Log.i(TAG, "Single recognizer produced ${result.textBlocks.size} blocks: ${result.text.take(60)}")
             val lines = mutableListOf<String>()
             for (block in result.textBlocks) {
                 for (line in block.lines) {
